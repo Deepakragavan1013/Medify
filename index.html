@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sentiment Analysis</h1>
+    <input type="text" id="userInput" placeholder="Enter a sentence..." />
+    <button onclick="analyzeSentiment()">Analyze</button>
+    <p id="result"></p>
+
+    <script>
+        async function analyzeSentiment() {
+            const text = document.getElementById("userInput").value.trim();
+            const resultElement = document.getElementById("result");
+
+            if (!text) {
+                resultElement.innerHTML = '<span class="error">Please enter a sentence.</span>';
+                return;
+            }
+
+            try {
+                const response = await fetch("/analyze", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text })
+                });
+
+                const result = await response.json();
+                if (result.error) {
+                    resultElement.innerHTML = '<span class="error">' + result.error + '</span>';
+                } else {
+                    resultElement.innerText = "Sentiment: " + result.sentiment;
+                }
+            } catch (error) {
+                resultElement.innerHTML = '<span class="error">Failed to connect to the server.</span>';
+            }
+        }
+    </script>
+</body>
+</html>
